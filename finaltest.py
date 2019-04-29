@@ -55,8 +55,6 @@ print("X.shape == {}; X.min == {:.3f}; X.max == {:.3f}".format(
 print("y.shape == {}; y.min == {:.3f}; y.max == {:.3f}".format(
     train_y.shape, train_y.min(), train_y.max()))
 
-num_objects = 2
-
 X = train_X
 
 y = train_y
@@ -69,29 +67,7 @@ model = Sequential([
     ])
 model.compile('adadelta', 'mse')
 
-# # Flip bboxes during training.
-# # Note: The validation loss is always quite big here because we don't flip the bounding boxes for the validation data. 
-def IOU(bbox1, bbox2):
-    '''Calculate overlap between two bounding boxes [x, y, w, h] as the area of intersection over the area of unity'''
-    x1, y1, w1, h1 = bbox1[0], bbox1[1], bbox1[2], bbox1[3]  # TODO: Check if its more performant if tensor elements are accessed directly below.
-    x2, y2, w2, h2 = bbox2[0], bbox2[1], bbox2[2], bbox2[3]
 
-    w_I = min(x1 + w1, x2 + w2) - max(x1, x2)
-    h_I = min(y1 + h1, y2 + h2) - max(y1, y2)
-    if w_I <= 0 or h_I <= 0:  # no overlap
-        return 0
-    I = w_I * h_I
-
-    U = w1 * h1 + w2 * h2 - I
-
-    return I / U
-
-def dist(bbox1, bbox2):
-    return np.sqrt(np.sum(np.square(bbox1[:2] - bbox2[:2])))
-
-num_epochs_flipping = 50
-
-# TODO: Calculate ious directly for all samples (using slices of the array pred_y for x, y, w, h).
 test_X, test_y = load(test=True)
 
 model.fit(train_X, train_y, 
