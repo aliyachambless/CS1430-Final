@@ -9,8 +9,10 @@ from pandas.io.parsers import read_csv
 from sklearn.utils import shuffle
 
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout
-from keras.optimizers import SGD
+from keras.layers import BatchNormalization, Conv2D, Activation, MaxPooling2D, Dense, GlobalAveragePooling2D
+from keras import optimizers
+
+import tensorflow as tf
 
 
 FTRAIN = './training.csv'
@@ -56,22 +58,32 @@ print("y.shape == {}; y.min == {:.3f}; y.max == {:.3f}".format(
     train_y.shape, train_y.min(), train_y.max()))
 
 X = train_X
-
 y = train_y
 
-model = Sequential([
-        Dense(256, input_dim=X.shape[-1]), 
-        Activation('relu'), 
-        Dropout(0.4), 
-        Dense(y.shape[-1])
-    ])
-model.compile('adadelta', 'mse')
+model = Sequential()
+model.add(Dense(100, activation="relu", input_shape=(96*96,)))
+model.add(Activation('relu'))
+model.add(Dense(30))
+
+sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+model.compile(optimizer=sgd, loss='mse', metrics=['accuracy'])
+epochs = 200
 
 
-test_X, test_y = load(test=True)
+#write mse for each point?
+#make a slightly different net
 
-model.fit(train_X, train_y, 
-          batch_size=32, nb_epoch=15, verbose=2)
+# //we want each point to be as close as possible to ground truth
+# //minimize distance
+# //make a loss funciton that is a dist funciton (or find)
+
+
+history = model.fit(train_X, train_y, 
+                 validation_split=0.2, shuffle=True, 
+                 epochs=epochs, batch_size=20)
+            
+model.save('/home/aliyac1999/model2.p5')
+
 
 #display matches
 
