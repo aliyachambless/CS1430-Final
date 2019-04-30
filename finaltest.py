@@ -82,7 +82,7 @@ history = model.fit(train_X, train_y,
                  validation_split=0.2, shuffle=True, 
                  epochs=epochs, batch_size=20)
             
-model.save('/home/aliyac1999/model2.p5')
+model.save('/home/aliyac1999/model2.h5')
 
 
 #display matches
