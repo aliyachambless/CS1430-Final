@@ -1,0 +1,25 @@
+# left is up on the filter sideways
+
+import numpy as np
+face_image = np.zeros([50,50])
+face_dict = {}
+face_dict['left_eye'] = np.array([40,15])
+face_dict['right_eye'] = np.array([10,15])
+face_dict['nose'] = np.array([24,24])
+face_dict['bottom'] = np.array([24,40])
+filter_image = np.zeros([10,10])
+filter_image[2,2] = 1
+filter_image[2][7] = 1
+filter_image[4,4] = 1
+filter_image[7][:] = 1
+filter_dict = {}
+filter_dict['left_eye'] = [2,2]
+filter_dict['right_eye'] = [2,7]
+filter_dict['nose'] = [4,4]
+filter_dict['bottom'] = [8,4]
+from matchup import matchup as MU
+mashed = MU(face_image, face_dict, filter_image, filter_dict)
+
+from skimage import io as SIO
+SIO.imshow(mashed)
+SIO.show()
