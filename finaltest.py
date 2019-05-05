@@ -57,12 +57,13 @@ print("y.shape == {}; y.min == {:.3f}; y.max == {:.3f}".format(
 
 X = train_X
 
+
 y = train_y
 
 model = Sequential([
-        Dense(256, input_dim=X.shape[-1]), 
-        Activation('relu'), 
-        Dropout(0.4), 
+        Dense(256, input_dim=X.shape[-1]),
+        Activation('relu'),
+        Dropout(0.4),
         Dense(y.shape[-1])
     ])
 model.compile('adadelta', 'mse')
@@ -70,7 +71,7 @@ model.compile('adadelta', 'mse')
 
 test_X, test_y = load(test=True)
 
-model.fit(train_X, train_y, 
+model.fit(train_X, train_y,
           batch_size=32, nb_epoch=15, verbose=2)
 
 #display matches
@@ -81,6 +82,7 @@ def plot_sample(x, y, axis):
     axis.scatter(y[0::2] * 48 + 48, y[1::2] * 48 + 48, marker='x', s=10)
 
 X, _ = load(test=True)
+print(X)
 y_pred = model.predict(X)
 
 fig = plt.figure(figsize=(6, 6))
