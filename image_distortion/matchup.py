@@ -2,6 +2,7 @@ import numpy as np
 from scipy.spatial import distance
 import cv2
 import math
+from skimage import io as SIO
 
 """
 Matches up a filter_image and an image of a face. The filter_image
@@ -60,12 +61,14 @@ def matchup(face_image, face_features_dictionary, filter_image, filter_features_
         point = [filter_over_spots[0][index], filter_over_spots[1][index]]
         displacement_from_center = [rotated_center[0] - point[0], rotated_center[1] - point[1]]
         try:
-            face_image[face_nose[0] - displacement_from_center[0]][face_nose[1] - displacement_from_center[1]] = rotated_filter[point[0], point[1]]
+            if (0 <= (face_nose[0] - displacement_from_center[0]) < face_image.shape[0]) and (0 <= (face_nose[1] - displacement_from_center[1]) < face_image.shape[1]):
+                face_image[face_nose[0] - displacement_from_center[0]][face_nose[1] - displacement_from_center[1]] = rotated_filter[point[0], point[1]]
         except IndexError:
             # this will sometimes happen from resizing the filter so it's
             # too large; we want to just ignore these cases
             0
-
+    SIO.imshow(rotated_filter)
+    SIO.show()
     return face_image
 
 """

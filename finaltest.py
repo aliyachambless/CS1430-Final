@@ -77,7 +77,6 @@ epochs = 200
 # //minimize distance
 # //make a loss funciton that is a dist funciton (or find)
 
-
 history = model.fit(train_X, train_y, 
                  validation_split=0.2, shuffle=True, 
                  epochs=epochs, batch_size=20)
