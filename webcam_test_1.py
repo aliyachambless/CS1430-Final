@@ -54,7 +54,13 @@ while True:
                 #save scaling factor used to make it square
                 scaleX = w / 96
                 scaleY = h / 96
-                img_crop = cv2.resize(img_crop, dsize=(96, 96), interpolation = cv2.INTER_CUBIC)
+                img_crop_fullsize = np.copy(img_crop)
+                img_crop_half_length = int(img_crop_fullsize.shape[0] / 2.0)
+                try:
+                    img_crop = cv2.resize(img_crop, dsize=(96, 96), interpolation = cv2.INTER_CUBIC)
+                except:
+                    # print("BIGG")
+                    continue
                 X = np.reshape(img_crop, (1, 9216))
                 X = X.astype(np.float32)
                 X = X / 255.
@@ -65,7 +71,7 @@ while True:
 
                 #defining plot
                 def plot (fig) :
-                    fig = fig * 48 + 48
+                    fig = fig * img_crop_half_length + img_crop_half_length
 
                     face_dict = {}
                     face_dict['right_eye'] = [int(fig[0][1]), int(fig[0][0])]
@@ -90,18 +96,18 @@ while True:
                     # img_crop[:][:][2] = MU(img_crop[:][:][2], face_dict, filter_image, filter_dict)
                     # final = img_crop
                     # print("BEFORE " + str(img_crop))
-                    final = MU(img_crop, face_dict, filter_image, filter_dict)
-                    print("EQUALITY " + str(img_crop == final))
+                    final = MU(img_crop_fullsize, face_dict, filter_image, filter_dict)
+                    # print("EQUALITY " + str(img_crop == final))
 
 
                     # final = np.array([MU(img_crop[:][0][:], face_dict, filter_image, filter_dict), MU(img_crop[:][1][:], face_dict, filter_image, filter_dict), MU(img_crop[:][2][:], face_dict, filter_image, filter_dict)])
-                    print("BEGINNNIG ")
-                    print(img_crop.shape)
-                    print(face_dict)
-                    print(filter_image.shape)
-                    print(filter_dict)
-                    print(final.shape)
-                    print(gray.shape)
+                    # print("BEGINNNIG ")
+                    # print(img_crop.shape)
+                    # print(face_dict)
+                    # print(filter_image.shape)
+                    # print(filter_dict)
+                    # print(final.shape)
+                    # print(gray.shape)
                     #rescaling face_info coords to 96x96 square
                     i = 0
                     #rescaling to cropped rectangle shape, then shifting by x and y to map to right place on gray
@@ -118,7 +124,9 @@ while True:
                     return final
 
                 # Display the resulting frame
-                gray[y:y+h, x:x+w] = cv2.resize(plot(face_info), (w,h))
+                gray[y:y+h, x:x+w] = plot(face_info)
+
+                # gray[y:y+h, x:x+w] = cv2.resize(plot(face_info), (w,h))
                 cv2.imshow('Video', gray)
 
                 # cv2.imshow('Video', plot(face_info))
