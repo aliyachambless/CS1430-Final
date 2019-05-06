@@ -2,6 +2,7 @@ import numpy as np
 from scipy.spatial import distance
 import cv2
 import math
+import operator
 
 """
 Matches up a filter_image and an image of a face. The filter_image
@@ -54,10 +55,70 @@ def matchup(face_image, face_features_dictionary, filter_image, filter_features_
 
     # imposes filter on face and returns new mashup image
     rotated_center = (np.array(rotated_filter.shape) / 2).astype(int)
-    filter_over_spots = np.array(np.where(rotated_filter != 0))
     # print(rotated_filter.shape)
     # print(rotated_filter.shape)
     # print(face_image.shape)
+
+    ########## START FAST ############
+
+    # mask = np.ma.array(rotated_filter, mask=(rotated_filter < .0001), fill_value = -5000.)
+    # fixed_filter = mask.filled()
+    # filter_half_ht, filter_half_wd = np.array(fixed_filter.shape) / 2
+    # # face_image = - face_image
+    # # print(fixed_filter.shape)
+    # # print(face_image.shape)
+    # # print(filter_half_ht)
+    # # print(filter_half_wd)
+    # sample = -face_image[max(face_nose[0] - math.floor(filter_half_ht), 0):min(face_nose[0] + math.ceil(filter_half_ht), face_image.shape[0]),max(face_nose[1] - math.floor(filter_half_wd), 0):min(face_nose[1] + math.ceil(filter_half_wd), face_image.shape[1])]
+    # sample_half_ht, sample_half_wd = np.array(sample.shape) / 2
+    # filter_overlay = fixed_filter[max(rotated_center[0] - math.floor(sample_half_ht), 0):min(rotated_center[0] + math.ceil(sample_half_ht),fixed_filter.shape[0]), max(rotated_center[1] - math.floor(sample_half_wd), 0):min(rotated_center[1] + math.ceil(sample_half_wd), fixed_filter.shape[1])]
+
+    # small_shapes = np.minimum(np.array(sample.shape), np.array(filter_overlay.shape))
+    # # sample = cropND(sample, small_shapes)
+    # # filter_overlay = cropND(filter_overlay, small_shapes)
+    # sample = crop2DCenter(sample, small_shapes, (np.array(sample.shape) / 2).astype(int))
+    # filter_overlay = crop2DCenter(filter_overlay, small_shapes, (np.array(filter_overlay.shape) / 2).astype(int))
+
+    # # print(rotated_center[0] - math.floor(sample_half_ht))
+    # # print(rotated_center[0] + math.ceil(sample_half_ht))
+    # # print(sample.shape)
+    # # print(sample_half_ht)
+    # # print(sample_half_wd)
+    # # print(filter_overlay.shape)
+    # # print(rotated_center)
+    # # print(fixed_filter.shape)
+    # # print(small_shapes)
+    # # print(face_image.shape)
+    # # a = (face_nose[0] - math.floor(small_shapes[0] / 2))
+    # # b = (face_nose[0] + math.ceil(small_shapes[0] / 2))
+    # # c = (face_nose[1] - math.floor(small_shapes[1] / 2))
+    # # d = (face_nose[1] + math.ceil(small_shapes[1] / 2))
+    # # print((face_image[a:b,c:d]).shape)
+    # # print((face_nose[0] - math.floor(small_shapes[0] / 2)))
+    # # print((face_nose[0] + math.ceil(small_shapes[0] / 2)))
+    # # print((face_nose[1] - math.floor(small_shapes[1] / 2)))
+    # # print((face_nose[1] + math.ceil(small_shapes[1] / 2)))
+    # # print(face_image[face_nose[0] - math.floor(small_shapes[0] / 2):face_nose[0] + math.ceil(small_shapes[0] / 2)][face_nose[1] - math.floor(small_shapes[1] / 2):face_nose[1] + math.ceil(small_shapes[1] / 2)].shape)
+    # # print((face_nose[0] - math.floor(small_shapes[0] / 2)) - (face_nose[0] + math.ceil(small_shapes[0] / 2)))
+    # # print((face_nose[1] - math.floor(small_shapes[1] / 2)) - (face_nose[1] + math.ceil(small_shapes[1] / 2)))
+    # # print(face_nose)
+    # cast = np.absolute(np.maximum(sample, filter_overlay))
+
+    # # from skimage import io as SIO
+    # # SIO.imshow(cast)
+    # # SIO.show()
+    # # print((face_nose[0] - math.floor(small_shapes[0] / 2)) -  (face_nose[0] + math.ceil(small_shapes[0] / 2)))
+    # # print((face_nose[1] - math.floor(small_shapes[1] / 2))  - (face_nose[1] + math.ceil(small_shapes[1] / 2)))
+    # underlay = face_image[face_nose[0] - math.floor(small_shapes[0] / 2):face_nose[0] + math.ceil(small_shapes[0] / 2), face_nose[1] - math.floor(small_shapes[1] / 2):face_nose[1] + math.ceil(small_shapes[1] / 2)]
+    # # cast = cropND(cast, underlay.shape)
+    # cast = crop2DCenter(cast, underlay.shape, (np.array(cast.shape) / 2).astype(int))
+    # face_image[face_nose[0] - math.floor(small_shapes[0] / 2):face_nose[0] + math.ceil(small_shapes[0] / 2), face_nose[1] - math.floor(small_shapes[1] / 2):face_nose[1] + math.ceil(small_shapes[1] / 2)] = -cast
+
+    ########## END FAST ############
+
+    face_image = np.absolute(face_image)
+    # TODO: REPLACE THIS CODE
+    filter_over_spots = np.array(np.where(rotated_filter != 0))
     for index in range(len(filter_over_spots[0])):
         point = [filter_over_spots[0][index], filter_over_spots[1][index]]
         displacement_from_center = [rotated_center[0] - point[0], rotated_center[1] - point[1]]
@@ -69,6 +130,7 @@ def matchup(face_image, face_features_dictionary, filter_image, filter_features_
             # too large; we want to just ignore these cases
             0
 
+    print(np.any(face_image < 0))
     return face_image
 
 """
@@ -84,6 +146,36 @@ def overlay_pixel_value(overlay, base):
         return base
     else:
         return overlay
+
+
+def crop2DCenter(img, size, center):
+    print(img.shape)
+    print(size)
+    print(center)
+    centerY, centerX = center
+    sizeY, sizeX = size
+    sizeYLower = math.floor(sizeY / 2)
+    sizeYUpper = math.ceil(sizeY / 2)
+    sizeXLower = math.floor(sizeX / 2)
+    sizeXUpper = math.ceil(sizeX / 2)
+    YLowerBound = centerY - sizeYLower
+    YUpperBound = centerY + sizeYUpper
+    XLowerBound = centerX - sizeXLower
+    XUpperBound = centerX + sizeXUpper
+    assert YLowerBound >= 0
+    assert YUpperBound <= img.shape[0]
+    assert XLowerBound >= 0
+    assert XUpperBound <= img.shape[1]
+    return img[YLowerBound:YUpperBound,XLowerBound:XUpperBound]
+"""
+from https://stackoverflow.com/a/50322574
+"""
+def cropND(img, bounding):
+    start = tuple(map(lambda a, da: a//2-da//2, img.shape, bounding))
+    end = tuple(map(operator.add, start, bounding))
+    slices = tuple(map(slice, start, end))
+    return img[slices]
+
 
 """
 implementation from

@@ -58,7 +58,7 @@ while True:
             #save scaling factor used to make it square
             scaleX = w / 96
             scaleY = h / 96
-            img_crop_fullsize = frame[y:y+h, x:x+w, :]
+            img_crop_fullsize = np.copy(frame[y:y+h, x:x+w, :])
             img_crop_half_length = int(img_crop_fullsize.shape[0] / 2.0)
             try:
                 img_crop = cv2.resize(img_crop, dsize=(96, 96), interpolation = cv2.INTER_CUBIC)
@@ -100,6 +100,7 @@ while True:
                 # img_crop[:][:][2] = MU(img_crop[:][:][2], face_dict, filter_image, filter_dict)
                 # final = img_crop
                 # print("BEFORE " + str(img_crop))
+                
                 img_crop_fullsize[:,:,0] = MU(img_crop_fullsize[:,:,0], face_dict, filter_image[:,:,0], filter_dict)
                 img_crop_fullsize[:,:,1] = MU(img_crop_fullsize[:,:,1], face_dict, filter_image[:,:,1], filter_dict)
                 img_crop_fullsize[:,:,2] = MU(img_crop_fullsize[:,:,2], face_dict, filter_image[:,:,2], filter_dict)
