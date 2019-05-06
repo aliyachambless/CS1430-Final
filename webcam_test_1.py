@@ -86,7 +86,6 @@ while True:
                 # final = img_crop
                 # print("BEFORE " + str(img_crop))
                 final = MU(img_crop, face_dict, filter_image, filter_dict)
-                print("EQUALITY " + str(img_crop == final))
 
 
                 # final = np.array([MU(img_crop[:][0][:], face_dict, filter_image, filter_dict), MU(img_crop[:][1][:], face_dict, filter_image, filter_dict), MU(img_crop[:][2][:], face_dict, filter_image, filter_dict)])
