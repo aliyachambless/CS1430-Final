@@ -56,12 +56,14 @@ def matchup(face_image, face_features_dictionary, filter_image, filter_features_
     rotated_center = (np.array(rotated_filter.shape) / 2).astype(int)
     filter_over_spots = np.array(np.where(rotated_filter != 0))
     # print(rotated_filter.shape)
+    # print(rotated_filter.shape)
+    # print(face_image.shape)
     for index in range(len(filter_over_spots[0])):
         point = [filter_over_spots[0][index], filter_over_spots[1][index]]
         displacement_from_center = [rotated_center[0] - point[0], rotated_center[1] - point[1]]
         try:
             face_image[face_nose[0] - displacement_from_center[0]][face_nose[1] - displacement_from_center[1]] = rotated_filter[point[0], point[1]]
-            print("YAYYYYYYY")
+
         except IndexError:
             # this will sometimes happen from resizing the filter so it's
             # too large; we want to just ignore these cases
