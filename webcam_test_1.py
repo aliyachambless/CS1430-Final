@@ -20,7 +20,7 @@ video_capture = cv2.VideoCapture(0)
 if_not_first = False
 face_cascade = cv2.CascadeClassifier('/Users/victoriaxu/Documents/CS/opencv-4.0.0/data/haarcascades/haarcascade_frontalface_default.xml')
 model = keras.models.load_model("model2.h5")
-filter_image = cv2.cvtColor(cv2.imread('/Users/victoriaxu/Downloads/mockup.png'), cv2.COLOR_BGR2GRAY)
+filter_image = cv2.cvtColor(cv2.imread('mockup.png'), cv2.COLOR_BGR2GRAY)
 filter_dict = {}
 filter_dict['left_eye'] = [25,27]
 filter_dict['right_eye'] = [25,67]
@@ -42,6 +42,8 @@ while True:
         for x,y,w,h in faces :
             #crops rectangle out of input image
             img_crop = img_crop[y:y+h, x:x+w]
+            # cv2.imwrite('/Users/victoriaxu/Downloads/face.png', img_crop)
+
             cv2.rectangle(gray,( x, y),( x + w,  y + h),(255,0,0),2)
             #save scaling factor used to make it square
             scaleX = w / 96
@@ -60,7 +62,8 @@ while True:
                 fig = fig * 48 + 48
 
                 face_dict = {}
-                face_dict['right_eye'] = [fig[0][1],fig[0][0]]
+                face_dict['right_eye'] = [fig[0][1],fig[0][0
+                ]]
                 # cv2.circle(img_crop, (fig[0][0],fig[0][1]), 3, (255,0,0))
                 # print(str(fig[0][0]) + " " + str(fig[0][1]))
                 face_dict['left_eye'] = [fig[0][3], fig[0][2]]
@@ -81,7 +84,10 @@ while True:
                 # img_crop[:][:][1] = MU(img_crop[:][:][1], face_dict, filter_image, filter_dict)
                 # img_crop[:][:][2] = MU(img_crop[:][:][2], face_dict, filter_image, filter_dict)
                 # final = img_crop
+                # print("BEFORE " + str(img_crop))
                 final = MU(img_crop, face_dict, filter_image, filter_dict)
+                print("EQUALITY " + str(img_crop == final))
+
 
                 # final = np.array([MU(img_crop[:][0][:], face_dict, filter_image, filter_dict), MU(img_crop[:][1][:], face_dict, filter_image, filter_dict), MU(img_crop[:][2][:], face_dict, filter_image, filter_dict)])
                 print("BEGINNNIG ")
