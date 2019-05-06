@@ -95,6 +95,7 @@ while True:
                 print(filter_image.shape)
                 print(filter_dict)
                 print(final.shape)
+                print(gray.shape)
                 #rescaling face_info coords to 96x96 square
                 i = 0
                 #rescaling to cropped rectangle shape, then shifting by x and y to map to right place on gray
@@ -107,10 +108,14 @@ while True:
                     # print("HIT")
                     i = i + 2
 
+
                 return final
 
             # Display the resulting frame
-            cv2.imshow('Video', plot(face_info))
+            gray[y:y+h, x:x+w] = cv2.resize(plot(face_info), (w,h))
+            cv2.imshow('Video', gray)
+
+            # cv2.imshow('Video', plot(face_info))
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
