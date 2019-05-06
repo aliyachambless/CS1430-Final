@@ -18,7 +18,7 @@ from image_distortion.matchup import matchup as MU
 video_capture = cv2.VideoCapture(0)
 #skip first frame of 0's
 if_not_first = False
-face_cascade = cv2.CascadeClassifier('/Users/victoriaxu/Documents/CS/opencv-4.0.0/data/haarcascades/haarcascade_frontalface_default.xml')
+face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 model = keras.models.load_model("model2.h5")
 filter_image = cv2.cvtColor(cv2.imread('mockup.png'), cv2.COLOR_BGR2GRAY)
 filter_dict = {}
@@ -62,19 +62,18 @@ while True:
                 fig = fig * 48 + 48
 
                 face_dict = {}
-                face_dict['right_eye'] = [fig[0][1],fig[0][0
-                ]]
+                face_dict['right_eye'] = [int(fig[0][1]), int(fig[0][0])]
                 # cv2.circle(img_crop, (fig[0][0],fig[0][1]), 3, (255,0,0))
                 # print(str(fig[0][0]) + " " + str(fig[0][1]))
-                face_dict['left_eye'] = [fig[0][3], fig[0][2]]
+                face_dict['left_eye'] = [int(fig[0][3]), int(fig[0][2])]
                 # cv2.circle(img_crop, (fig[0][2], fig[0][3]), 3, (255,0,0))
                 # print(str(fig[0][2]) + " " + str(fig[0][3]))
 
-                face_dict['nose'] = [fig[0][21], fig[0][20]]
+                face_dict['nose'] = [int(fig[0][21]), int(fig[0][20])]
                 # cv2.circle(img_crop, (fig[0][20], fig[0][21]), 3, (255,0,0))
                 # print(str(fig[0][0]) + " " + str(fig[0][1]))
 
-                face_dict['bottom'] = [fig[0][29],fig[0,28]]
+                face_dict['bottom'] = [int(fig[0][29]), int(fig[0,28])]
                 # cv2.circle(img_crop, (fig[0][28],fig[0,29]), 3, (255,0,0))
                 # print(str(fig[0][0]) + " " + str(fig[0][1]))
 
