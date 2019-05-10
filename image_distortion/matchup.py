@@ -60,154 +60,29 @@ def matchup(face_image, face_features_dictionary, filter_image, filter_features_
 
     # imposes filter on face and returns new mashup image
     rotated_center = (np.array(rotated_filter.shape) / 2).astype(int)
-    # print(rotated_filter.shape)
-    # print(rotated_filter.shape)
-    # print(face_image.shape)
 
-    ########## START FAST ############
-
-    # mask = np.ma.array(rotated_filter, mask=(rotated_filter < .0000001), fill_value = -5000.)
+    # creates mask for filter, where zeroes are replaced with -5000's
     mask = np.ma.array(rotated_filter, mask=(rotated_filter == 0), fill_value = -5000.)
-
     fixed_filter = mask.filled()
     filter_half_ht, filter_half_wd = np.array(fixed_filter.shape) / 2
-    # face_image = - face_image
-    # print(fixed_filter.shape)
-    # print(face_image.shape)
-    # print(filter_half_ht)
-    # print(filter_half_wd)
 
-    # sample fits in the face_image and does its best to center the shape of the filter on the location of the nose
+    # takes a sample of the face where the filter would be imposed and negates it
     sample = face_image[max(face_nose[0] - math.floor(filter_half_ht), 0):min(face_nose[0] + math.ceil(filter_half_ht), face_image.shape[0]),max(face_nose[1] - math.floor(filter_half_wd), 0):min(face_nose[1] + math.ceil(filter_half_wd), face_image.shape[1])]
-    # print("STARTBOI")
-    # print(sample)
     sample = np.negative(sample)
-    # print(sample)
     sample_half_ht, sample_half_wd = np.array(sample.shape) / 2
 
-    # filter_overlay is a center-centered crop of filter which does its best to fit the filter on the face sample
+    # takes a portion of the filter to fit the sample of the face
     filter_overlay = fixed_filter[max(rotated_center[0] - math.floor(sample_half_ht), 0):min(rotated_center[0] + math.ceil(sample_half_ht),fixed_filter.shape[0]), max(rotated_center[1] - math.floor(sample_half_wd), 0):min(rotated_center[1] + math.ceil(sample_half_wd), fixed_filter.shape[1])]
 
-    # 
-    # print(sample.shape == filter_overlay.shape)
-
-    # this is the shape of both the sample and the filter overlay
+    # assures that the filter portion to fit the face and the face portion being fit are same-shaped
     small_shapes = np.minimum(np.array(sample.shape), np.array(filter_overlay.shape))
     assert (small_shapes[0] == sample.shape[0] == filter_overlay.shape[0] and
             small_shapes[1] == sample.shape[1] == filter_overlay.shape[1])
-    # sample = cropND(sample, small_shapes)
-    # filter_overlay = cropND(filter_overlay, small_shapes)
 
-    # sample = crop2DCenter(sample, small_shapes, (np.array(sample.shape) / 2).astype(int))
-    # filter_overlay = crop2DCenter(filter_overlay, small_shapes, (np.array(filter_overlay.shape) / 2).astype(int))
-
-    # print(rotated_center[0] - math.floor(sample_half_ht))
-    # print(rotated_center[0] + math.ceil(sample_half_ht))
-    # print(sample.shape)
-    # print(sample_half_ht)
-    # print(sample_half_wd)
-    # print(filter_overlay.shape)
-    # print(rotated_center)
-    # print(fixed_filter.shape)
-    # print(small_shapes)
-    # print(face_image.shape)
-    # a = (face_nose[0] - math.floor(small_shapes[0] / 2))
-    # b = (face_nose[0] + math.ceil(small_shapes[0] / 2))
-    # c = (face_nose[1] - math.floor(small_shapes[1] / 2))
-    # d = (face_nose[1] + math.ceil(small_shapes[1] / 2))
-    # print((face_image[a:b,c:d]).shape)
-    # print((face_nose[0] - math.floor(small_shapes[0] / 2)))
-    # print((face_nose[0] + math.ceil(small_shapes[0] / 2)))
-    # print((face_nose[1] - math.floor(small_shapes[1] / 2)))
-    # print((face_nose[1] + math.ceil(small_shapes[1] / 2)))
-    # print(face_image[face_nose[0] - math.floor(small_shapes[0] / 2):face_nose[0] + math.ceil(small_shapes[0] / 2)][face_nose[1] - math.floor(small_shapes[1] / 2):face_nose[1] + math.ceil(small_shapes[1] / 2)].shape)
-    # print((face_nose[0] - math.floor(small_shapes[0] / 2)) - (face_nose[0] + math.ceil(small_shapes[0] / 2)))
-    # print((face_nose[1] - math.floor(small_shapes[1] / 2)) - (face_nose[1] + math.ceil(small_shapes[1] / 2)))
-    # print(face_nose)
-    # print(sample)
-
+    # applies the filter to the sample of the face in question, and returns
     cast = np.absolute(np.maximum(sample, filter_overlay))
-    # slowcast = np.copy(sample)
-    # for i in range(len(filter_overlay)):
-    #     for j in range(len(filter_overlay[0])):
-    #         if filter_overlay[i,j] > 0:
-    #             slowcast[i,j] = filter_overlay[i,j]
-    #             if (cast[i,j] != slowcast[i,j]):
-                    # print("NONMATCH")
-                    # print(cast[i,j])
-                    # print(slowcast[i,j])
-                    # print(sample[i,j])
-                    # print(filter_overlay[i,j])
-
-
-    # print(np.any(cast < 0))
-    # SIO.imshow(cast)
-    # SIO.show()
-
-    # from skimage import io as SIO
-    # SIO.imshow(cast)
-    # SIO.show()
-    # print((face_nose[0] - math.floor(small_shapes[0] / 2)) -  (face_nose[0] + math.ceil(small_shapes[0] / 2)))
-    # print((face_nose[1] - math.floor(small_shapes[1] / 2))  - (face_nose[1] + math.ceil(small_shapes[1] / 2)))
-    underlay = face_image[face_nose[0] - math.floor(small_shapes[0] / 2):face_nose[0] + math.ceil(small_shapes[0] / 2), face_nose[1] - math.floor(small_shapes[1] / 2):face_nose[1] + math.ceil(small_shapes[1] / 2)]
-    # cast = cropND(cast, underlay.shape)
-    # cast = crop2DCenter(cast, underlay.shape, (np.array(cast.shape) / 2).astype(int))
-    # SIO.imshow(underlay)
-    # SIO.show()
-    # SIO.imshow(cast)
-    # SIO.show()
-    first = np.copy(face_image[face_nose[0] - math.floor(small_shapes[0] / 2):face_nose[0] + math.ceil(small_shapes[0] / 2), face_nose[1] - math.floor(small_shapes[1] / 2):face_nose[1] + math.ceil(small_shapes[1] / 2)])
-
-    # SIO.imshow(cast)
-    # SIO.show()
-    # face_image[face_nose[0] - math.floor(small_shapes[0] / 2):face_nose[0] + math.ceil(small_shapes[0] / 2), face_nose[1] - math.floor(small_shapes[1] / 2):face_nose[1] + math.ceil(small_shapes[1] / 2)] = cast
     face_image[max(face_nose[0] - math.floor(filter_half_ht), 0):min(face_nose[0] + math.ceil(filter_half_ht), face_image.shape[0]),max(face_nose[1] - math.floor(filter_half_wd), 0):min(face_nose[1] + math.ceil(filter_half_wd), face_image.shape[1])] = cast
-    
-    # underlay = cast
-    # face_image = np.absolute(face_image)
-    ########## END FAST ############
-
-    # face_image = np.absolute(face_image)
-    # # TODO: REPLACE THIS CODE
-    # filter_over_spots = np.array(np.where(rotated_filter != 0))
-    # for index in range(len(filter_over_spots[0])):
-    #     point = [filter_over_spots[0][index], filter_over_spots[1][index]]
-    #     displacement_from_center = [rotated_center[0] - point[0], rotated_center[1] - point[1]]
-    #     try:
-    #         face_image[face_nose[0] - displacement_from_center[0]][face_nose[1] - displacement_from_center[1]] = rotated_filter[point[0], point[1]]
-    #         # print('success')
-    #     except IndexError:
-    #         # this will sometimes happen from resizing the filter so it's
-    #         # too large; we want to just ignore these cases
-    #         0
-
-    # print(np.any(face_image < 0))
-    # print(face_image.shape == orig_shape)
-    # SIO.imshow(face_image)
-    # SIO.show()
-    # SIO.imshow(orig_face)
-    # SIO.show()
-    # SIO.imshow(first)
-    # SIO.show()
-    # SIO.imshow(cast)
-    # SIO.show()
-    # print(np.any(face_image < 0))
-    # print(np.any(face_image > 255.))
-    return face_image.astype(int)
-
-"""
-Overlays a pixel value on a base pixel; if overlay value is 0, simply leaves the original
-value there.
-
-@param overlay the overlay pixel
-@param base the base pixel
-@return the result of overlaying the pixel
-"""
-def overlay_pixel_value(overlay, base):
-    if (overlay == 0):
-        return base
-    else:
-        return overlay
+    return face_image
 
 
 def crop2DCenter(img, size, center):
@@ -229,14 +104,6 @@ def crop2DCenter(img, size, center):
     assert XLowerBound >= 0
     assert XUpperBound <= img.shape[1]
     return img[YLowerBound:YUpperBound,XLowerBound:XUpperBound]
-"""
-from https://stackoverflow.com/a/50322574
-"""
-def cropND(img, bounding):
-    start = tuple(map(lambda a, da: a//2-da//2, img.shape, bounding))
-    end = tuple(map(operator.add, start, bounding))
-    slices = tuple(map(slice, start, end))
-    return img[slices]
 
 
 """
