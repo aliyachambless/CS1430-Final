@@ -12,8 +12,12 @@ import matplotlib.pyplot as plt
 from tensorflow import keras
 from image_distortion.matchup import matchup as MU
 import argparse
+import pickle
 # import Image
 
+#get the pipeline to transform this bby back to 96 by 96
+with open('my_sklearn_objects.pkl', 'rb') as f:
+    output_pipe = pickle.load(f)
 
 # This function loads the correct filter image based on the user's command line argument
 # run the code using python webcam_test_1.py -f <filter image file name>
@@ -42,7 +46,7 @@ video_capture = cv2.VideoCapture(0)
 #skip first frame of 0's
 if_not_first = False
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-model = keras.models.load_model("model2.h5")
+model = keras.models.load_model("finalmodel.h5")
 # filter_image = cv2.cvtColor(cv2.imread('mockup.png'), cv2.COLOR_BGR2GRAY)
 
 filter_dict = {}
@@ -88,12 +92,13 @@ while True:
             except:
                 # print("BIGG")
                 continue
-            X = np.reshape(img_crop, (1, 9216))
+            X = np.reshape(img_crop, (96, 96))
             X = X.astype(np.float32)
             X = X / 255.
 
             #predicting with model
-            face_info = model.predict(X)
+            predictions = model.predict(X[np.newaxis, :, :, np.newaxis])
+            face_info = (output_pipe.inverse_transform(predictions).reshape(1, 30)-48)/48
 
 
             #defining plot

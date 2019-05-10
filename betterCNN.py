@@ -3,12 +3,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from keras.models import Sequential
+
+from keras.preprocessing.image import ImageDataGenerator
 from keras.layers import BatchNormalization, Conv2D, Activation, MaxPooling2D, Dense, GlobalAveragePooling2D, Dropout, Flatten
 from keras import optimizers
 
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import MinMaxScaler
 
+
+from tensorflow import keras
+import pickle
 # code for loading the data is from Florian LE BOURDAIS (http://flothesof.github.io/convnet-face-keypoint-detection.html)
 
 df = pd.read_csv('./training.csv')
@@ -34,6 +39,12 @@ output_pipe = make_pipeline(
 
 y_train = output_pipe.fit_transform(y)
 
+<<<<<<< HEAD
+=======
+#save the pipeline for later to transform the model output back to real coords
+with open('my_sklearn_objects.pkl', 'wb') as f:
+    pickle.dump((output_pipe), f)
+>>>>>>> 0f3100b390668dbc89d4945e0a6dd8513cd70147
 # end of Florian LE BOURDAIS load code
 
 # Florian LE BOURDAIS code for plotting points - modified for testing with google cloud engine
@@ -91,11 +102,31 @@ model.add(Dense(30))
 sgd = optimizers.SGD(lr=0.1, decay=1e-6, momentum=0.95, nesterov=True)
 model.compile(optimizer=sgd, loss='mse', metrics=['accuracy'])
 epochs = 50
+<<<<<<< HEAD
 history = model.fit(X_train, y_train, 
                  validation_split=0.2, shuffle=True, 
                  epochs=epochs, batch_size=20)
 
 model.save('/home/aliyac1999/finalmodel.h5')
 
+=======
+
+datagen = ImageDataGenerator(
+    featurewise_center=False,
+    featurewise_std_normalization=False,
+    rotation_range=90,
+    horizontal_flip=True)
+datagen.fit(X_train)
+
+history = model.fit_generator(datagen.flow(X_train, y_train, batch_size=20),
+                steps_per_epoch=len(X_train) / 20, shuffle=True, 
+                epochs=epochs)
+
+model.save('/home/aliyac1999/finalmodel.h5')
+
+#this line loads the model
+#model = keras.models.load_model("finalmodel.h5")
+
+>>>>>>> 0f3100b390668dbc89d4945e0a6dd8513cd70147
 #this saves 16 random faces with keypoints
 plot_faces_with_keypoints_and_predictions(model, model_input='2d')
