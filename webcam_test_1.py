@@ -11,8 +11,31 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow import keras
 from image_distortion.matchup import matchup as MU
+import argparse
 # import Image
 
+
+# This function loads the correct filter image based on the user's command line argument
+# run the code using python webcam_test_1.py -f <filter image file name>
+# our given options are multi and plant
+def load_data(file_name): 
+    filter_img ="multi.png"
+    if file_name == "multi":
+        pass
+    elif file_name == "plant":
+        filter_img = "plant2.png"
+    elif file_name == "std":
+        filter_img = "mockup.png"
+    return filter_img
+
+# create the command line parser
+parser = argparse.ArgumentParser()
+parser.add_argument("-f", "--filter", required=True, help="Either multi.png, or plant2.png. Choose which face filter to use")
+args = parser.parse_args()
+
+# Load in the filter image based on command line input
+filter_image = cv2.imread(load_data(args.filter))
+filter_image = cv2.resize(filter_image, (96, 96)).astype(int)
 
 
 video_capture = cv2.VideoCapture(0)
@@ -21,7 +44,6 @@ if_not_first = False
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 model = keras.models.load_model("model2.h5")
 # filter_image = cv2.cvtColor(cv2.imread('mockup.png'), cv2.COLOR_BGR2GRAY)
-filter_image = cv2.imread('mockup.png')
 
 filter_dict = {}
 filter_dict['left_eye'] = [25,27]
