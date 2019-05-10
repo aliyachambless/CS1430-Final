@@ -93,6 +93,7 @@ def plot_sample(x, y, axis):
     axis.scatter(y[0::2] * 48 + 48, y[1::2] * 48 + 48, marker='x', s=10)
 
 X, _ = load(test=True)
+print(X)
 y_pred = model.predict(X)
 
 fig = plt.figure(figsize=(6, 6))
