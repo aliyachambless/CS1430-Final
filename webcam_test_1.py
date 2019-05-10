@@ -34,8 +34,8 @@ parser.add_argument("-f", "--filter", required=True, help="Either multi.png, or 
 args = parser.parse_args()
 
 # Load in the filter image based on command line input
-filter_image = cv2.imread(load_data(args.filter))
-filter_image = cv2.resize(filter_image, (96, 96)).astype(int)
+filter_image = (cv2.imread(load_data(args.filter))).astype(int)
+# filter_image = cv2.resize(filter_image, (96, 96)).astype(int)
 
 
 video_capture = cv2.VideoCapture(0)
@@ -46,10 +46,11 @@ model = keras.models.load_model("model2.h5")
 # filter_image = cv2.cvtColor(cv2.imread('mockup.png'), cv2.COLOR_BGR2GRAY)
 
 filter_dict = {}
-filter_dict['left_eye'] = [25,27]
-filter_dict['right_eye'] = [25,67]
-filter_dict['nose'] = [45,47]
-filter_dict['bottom'] = [74,47]
+filter_y, filter_x = filter_image.shape[0], filter_image.shape[1]
+filter_dict['left_eye'] = [(25 / 96) * filter_y, (27 / 96) * filter_x]
+filter_dict['right_eye'] = [(25 / 96) * filter_y, (67 / 96) * filter_x]
+filter_dict['nose'] = [(45 / 96) * filter_y, (47 / 96) * filter_x]
+filter_dict['bottom'] = [(74 / 96) * filter_y, (47 / 96) * filter_x]
 
 
 while True:

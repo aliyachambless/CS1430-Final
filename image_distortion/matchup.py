@@ -20,6 +20,8 @@ filter features 'left_eye', 'right_eye', 'nose', and 'bottom'
 @return np array of original face image with filter superimposed on it
 """
 def matchup(face_image, face_features_dictionary, filter_image, filter_features_dictionary):
+    face_image = face_image.astype(int)
+    filter_image = filter_image.astype(int)
     orig_shape = face_image.shape
     # orig_face = np.copy(face_image)
     face_left_eye, face_right_eye, face_nose, face_bottom = face_features_dictionary['left_eye'], face_features_dictionary['right_eye'], face_features_dictionary['nose'], face_features_dictionary['bottom']
@@ -76,7 +78,11 @@ def matchup(face_image, face_features_dictionary, filter_image, filter_features_
     # print(filter_half_wd)
 
     # sample fits in the face_image and does its best to center the shape of the filter on the location of the nose
-    sample = -face_image[max(face_nose[0] - math.floor(filter_half_ht), 0):min(face_nose[0] + math.ceil(filter_half_ht), face_image.shape[0]),max(face_nose[1] - math.floor(filter_half_wd), 0):min(face_nose[1] + math.ceil(filter_half_wd), face_image.shape[1])]
+    sample = face_image[max(face_nose[0] - math.floor(filter_half_ht), 0):min(face_nose[0] + math.ceil(filter_half_ht), face_image.shape[0]),max(face_nose[1] - math.floor(filter_half_wd), 0):min(face_nose[1] + math.ceil(filter_half_wd), face_image.shape[1])]
+    # print("STARTBOI")
+    # print(sample)
+    sample = np.negative(sample)
+    # print(sample)
     sample_half_ht, sample_half_wd = np.array(sample.shape) / 2
 
     # filter_overlay is a center-centered crop of filter which does its best to fit the filter on the face sample
@@ -118,11 +124,21 @@ def matchup(face_image, face_features_dictionary, filter_image, filter_features_
     # print((face_nose[0] - math.floor(small_shapes[0] / 2)) - (face_nose[0] + math.ceil(small_shapes[0] / 2)))
     # print((face_nose[1] - math.floor(small_shapes[1] / 2)) - (face_nose[1] + math.ceil(small_shapes[1] / 2)))
     # print(face_nose)
-    cast = np.absolute(np.maximum(-sample, filter_overlay))
-    slowcast = np.copy(-sample)
-    for i in range(len(filter_overlay)):
-        for j in range(len(i)):
-            
+    # print(sample)
+
+    cast = np.absolute(np.maximum(sample, filter_overlay))
+    # slowcast = np.copy(sample)
+    # for i in range(len(filter_overlay)):
+    #     for j in range(len(filter_overlay[0])):
+    #         if filter_overlay[i,j] > 0:
+    #             slowcast[i,j] = filter_overlay[i,j]
+    #             if (cast[i,j] != slowcast[i,j]):
+                    # print("NONMATCH")
+                    # print(cast[i,j])
+                    # print(slowcast[i,j])
+                    # print(sample[i,j])
+                    # print(filter_overlay[i,j])
+
 
     # print(np.any(cast < 0))
     # SIO.imshow(cast)
