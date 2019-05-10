@@ -11,9 +11,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import MinMaxScaler
 
 from tensorflow import keras
-
 import pickle
-
 # code for loading the data is from Florian LE BOURDAIS (http://flothesof.github.io/convnet-face-keypoint-detection.html)
 
 df = pd.read_csv('./training.csv')
@@ -42,7 +40,6 @@ y_train = output_pipe.fit_transform(y)
 #save the pipeline for later to transform the model output back to real coords
 with open('my_sklearn_objects.pkl', 'wb') as f:
     pickle.dump((output_pipe), f)
-
 # end of Florian LE BOURDAIS load code
 
 # Florian LE BOURDAIS code for plotting points - modified for testing with google cloud engine
